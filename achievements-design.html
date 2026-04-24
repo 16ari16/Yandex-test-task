@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yandex Games - Дизайн-система достижений</title>
+  <style>
+    :root {
+      --color-primary: #1A88FF;
+      --color-primary-pressed: #1570DE;
+      --color-success: #28A745;
+      --color-warning: #FFD400;
+      --color-error: #F44336;
+      --color-bg: #F5F5F5;
+      --color-surface: #FFFFFF;
+      --color-text-primary: #212121;
+      --color-text-secondary: #6E6E6E;
+      --color-text-tertiary: #A6A6A6;
+      --color-border: #E3E3E3;
+      --color-icon: #5F5F5F;
+      
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-glow: 0 0 24px rgba(255,212,0,0.4);
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'YS Text', 'Helvetica Neue', Arial, sans-serif; background: var(--color-bg); color: var(--color-text-primary); line-height: 1.5; }
+    
+    h1 { font-size: 24px; font-weight: 700; line-height: 1.17; }
+    h2 { font-size: 20px; font-weight: 600; line-height: 1.2; }
+    h3 { font-size: 16px; font-weight: 600; line-height: 1.25; }
+    .body-text { font-size: 16px; font-weight: 400; }
+    .caption { font-size: 12px; font-weight: 400; }
+    .label { font-size: 14px; font-weight: 500; }
+    
+    .page { padding: var(--space-xl); }
+    .page-title { margin-bottom: var(--space-lg); color: var(--color-text-primary); }
+    .section { margin-bottom: var(--space-2xl); }
+    .section-title { margin-bottom: var(--space-md); color: var(--color-text-secondary); }
+    
+    .tokens-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-md); }
+    .token { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--shadow-sm); }
+    .token-color { width: 100%; height: 48px; border-radius: var(--radius-sm); margin-bottom: var(--space-sm); }
+    .token-name { font-size: 12px; font-weight: 600; color: var(--color-text-primary); word-break: break-all; }
+    .token-value { font-size: 11px; color: var(--color-text-tertiary); font-family: monospace; }
+    
+    .spacing-grid { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+    .spacing-box { background: var(--color-primary); border-radius: var(--radius-sm); min-width: 8px; min-height: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; }
+    
+    .typography-demo { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-lg); box-shadow: var(--shadow-sm); }
+    .typography-row { display: flex; align-items: baseline; gap: var(--space-md); padding: var(--space-sm) 0; border-bottom: 1px solid var(--color-border); }
+    .typography-row:last-child { border-bottom: none; }
+    .typography-name { width: 100px; font-size: 12px; color: var(--color-text-tertiary); flex-shrink: 0; }
+    
+    .phone-frame { width: 375px; height: 812px; background: var(--color-surface); border-radius: 40px; overflow: hidden; box-shadow: var(--shadow-md); position: relative; flex-shrink: 0; }
+    .phone-notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 180px; height: 30px; background: var(--color-surface); border-radius: 0 0 20px 20px; z-index: 10; }
+    
+    .achievement-card { background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--shadow-sm); width: 170px; }
+    .achievement-card.completed { border: 2px solid var(--color-success); }
+    .achievement-card.locked { opacity: 0.5; }
+    .achievement-icon { width: 48px; height: 48px; background: var(--color-primary); border-radius: var(--radius-md); margin: 0 auto var(--space-sm); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+    .achievement-card.locked .achievement-icon { background: var(--color-border); }
+    .card-badge { position: absolute; top: var(--space-sm); right: var(--space-sm); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; }
+    .badge-success { background: var(--color-success); }
+    .badge-rare { background: var(--color-warning); box-shadow: var(--shadow-glow); }
+    
+    .game-tabs { display: flex; gap: var(--space-sm); overflow-x: auto; padding: var(--space-md); }
+    .game-tab { padding: var(--space-sm) var(--space-md); border-radius: var(--radius-full); font-size: 14px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+    .game-tab.active { background: var(--color-primary); color: white; }
+    .game-tab.inactive { background: transparent; border: 1px solid var(--color-border); color: var(--color-text-secondary); }
+    
+    .stats-row { display: flex; gap: var(--space-md); padding: var(--space-md); }
+    .stats-card { flex: 1; background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); box-shadow: var(--shadow-sm); text-align: center; }
+    .stats-value { font-size: 24px; font-weight: 700; color: var(--color-primary); }
+    .stats-label { font-size: 12px; color: var(--color-text-secondary); }
+    
+    .achievements-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-md); padding: var(--space-md); }
+    .achievement-card { position: relative; }
+    .achievement-title { font-size: 14px; font-weight: 600; margin-bottom: var(--space-xs); text-align: center; }
+    .achievement-game { font-size: 11px; color: var(--color-text-secondary); text-align: center; }
+    
+    .screen-list { display: flex; gap: var(--space-xl); overflow-x: auto; padding: var(--space-lg); }
+    .screen-wrapper { flex-shrink: 0; }
+    .screen-label { margin-bottom: var(--space-sm); font-size: 12px; color: var(--color-text-secondary); }
+    
+    .progress-ring-wrapper { display: flex; align-items: center; justify-content: center; padding: var(--space-lg); }
+    .progress-ring { position: relative; width: 160px; height: 160px; }
+    .progress-ring svg { transform: rotate(-90deg); }
+    .progress-ring circle { fill: none; stroke-width: 10; }
+    .progress-ring .track { stroke: var(--color-border); }
+    .progress-ring .progress { stroke: var(--color-primary); stroke-linecap: round; }
+    .progress-ring .label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; font-weight: 700; }
+    
+    .leaderboard { background: var(--color-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .leaderboard-row { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--color-border); }
+    .leaderboard-row:last-child { border-bottom: none; }
+    .leaderboard-row.highlight { background: #E3F2FD; }
+    .rank { width: 24px; text-align: center; font-weight: 600; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-border); }
+    .name { flex: 1; font-weight: 600; }
+    .score { color: var(--color-primary); font-weight: 600; }
+    
+    .header { display: flex; align-items: center; padding: var(--space-md); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .header-back { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .header-title { flex: 1; text-align: center; font-weight: 600; font-size: 18px; }
+    
+    .tab-switcher { display: flex; background: var(--color-bg); border-radius: var(--radius-full); padding: 4px; margin: var(--space-md); }
+    .tab-switcher button { flex: 1; padding: var(--space-sm) var(--space-md); border: none; background: transparent; border-radius: var(--radius-full); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .tab-switcher button.active { background: var(--color-surface); box-shadow: var(--shadow-sm); color: var(--color-primary); }
+    
+    .progress-bar { height: 8px; background: var(--color-border); border-radius: var(--radius-full); overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--color-primary); border-radius: var(--radius-full); }
+    
+    .game-progress-list { background: var(--color-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .game-progress-item { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md); border-bottom: 1px solid var(--color-border); }
+    .game-progress-item:last-child { border-bottom: none; }
+    .game-progress-info { flex: 1; }
+    .game-progress-name { font-weight: 600; }
+    .game-progress-stats { font-size: 12px; color: var(--color-text-secondary); }
+    .game-progress-bar { width: 80px; }
+    
+    .detail-content { padding: var(--space-lg); text-align: center; }
+    .detail-icon { width: 120px; height: 120px; margin: 0 auto var(--space-md); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; box-shadow: var(--shadow-glow); }
+    .detail-title { font-size: 24px; font-weight: 700; margin-bottom: var(--space-sm); }
+    .detail-game { display: inline-block; padding: var(--space-xs) var(--space-sm); background: var(--color-primary); color: white; border-radius: var(--radius-full); font-size: 12px; margin-bottom: var(--space-md); }
+    .detail-desc { font-size: 16px; color: var(--color-text-secondary); margin-bottom: var(--space-lg); }
+    .detail-progress { margin-bottom: var(--space-md); }
+    .detail-date { color: var(--color-success); font-size: 14px; }
+    
+    .search-input { margin: var(--space-md); padding: var(--space-sm) var(--space-md); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-full); font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- PAGE 1: TOKENS -->
+<div class="page">
+  <h1 class="page-title">Design Tokens</h1>
+  
+  <div class="section">
+    <h2 class="section-title">Colors</h2>
+    <div class="tokens-grid">
+      <div class="token">
+        <div class="token-color" style="background: #1A88FF;"></div>
+        <div class="token-name">--color-primary</div>
+        <div class="token-value">#1A88FF</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #1570DE;"></div>
+        <div class="token-name">--color-primary-pressed</div>
+        <div class="token-value">#1570DE</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #28A745;"></div>
+        <div class="token-name">--color-success</div>
+        <div class="token-value">#28A745</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #FFD400;"></div>
+        <div class="token-name">--color-warning</div>
+        <div class="token-value">#FFD400</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #F44336;"></div>
+        <div class="token-name">--color-error</div>
+        <div class="token-value">#F44336</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #F5F5F5;"></div>
+        <div class="token-name">--color-bg</div>
+        <div class="token-value">#F5F5F5</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #FFFFFF; border: 1px solid #E3E3E3;"></div>
+        <div class="token-name">--color-surface</div>
+        <div class="token-value">#FFFFFF</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #212121;"></div>
+        <div class="token-name">--color-text-primary</div>
+        <div class="token-value">#212121</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #6E6E6E;"></div>
+        <div class="token-name">--color-text-secondary</div>
+        <div class="token-value">#6E6E6E</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #A6A6A6;"></div>
+        <div class="token-name">--color-text-tertiary</div>
+        <div class="token-value">#A6A6A6</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #E3E3E3;"></div>
+        <div class="token-name">--color-border</div>
+        <div class="token-value">#E3E3E3</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Spacing (4px grid)</h2>
+    <div class="spacing-grid">
+      <div class="spacing-box" style="width: 4px; height: 4px;">4</div>
+      <div class="spacing-box" style="width: 8px; height: 8px;">8</div>
+      <div class="spacing-box" style="width: 12px; height: 12px;">12</div>
+      <div class="spacing-box" style="width: 16px; height: 16px;">16</div>
+      <div class="spacing-box" style="width: 24px; height: 24px;">24</div>
+      <div class="spacing-box" style="width: 32px; height: 32px;">32</div>
+      <div class="spacing-box" style="width: 48px; height: 48px;">48</div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Typography</h2>
+    <div class="typography-demo">
+      <div class="typography-row">
+        <span class="typography-name">--text-h1</span>
+        <span style="font-size: 24px; font-weight: 700;">Заголовок 24px/700</span>
+      </div>
+      <div class="typography-row">
+        <span class="typography-name">--text-h2</span>
+        <span style="font-size: 20px; font-weight: 600;">Подзаголовок 20px/600</span>
+      </div>
+      <div class="typography-row">
+        <span class="typography-name">--text-body</span>
+        <span style="font-size: 16px; font-weight: 400;">Основной текст 16px/400</span>
+      </div>
+      <div class="typography-row">
+        <span class="typography-name">--text-body-semibold</span>
+        <span style="font-size: 16px; font-weight: 600;">Жирный текст 16px/600</span>
+      </div>
+      <div class="typography-row">
+        <span class="typography-name">--text-caption</span>
+        <span style="font-size: 12px; font-weight: 400;">Подпись 12px/400</span>
+      </div>
+      <div class="typography-row">
+        <span class="typography-name">--text-label</span>
+        <span style="font-size: 14px; font-weight: 500;">Лейбл 14px/500</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Border Radius</h2>
+    <div class="tokens-grid">
+      <div class="token">
+        <div class="token-color" style="background: #1A88FF; border-radius: 8px;"></div>
+        <div class="token-name">--radius-sm</div>
+        <div class="token-value">8px</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #1A88FF; border-radius: 12px;"></div>
+        <div class="token-name">--radius-md</div>
+        <div class="token-value">12px</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #1A88FF; border-radius: 16px;"></div>
+        <div class="token-name">--radius-lg</div>
+        <div class="token-value">16px</div>
+      </div>
+      <div class="token">
+        <div class="token-color" style="background: #1A88FF; border-radius: 9999px;"></div>
+        <div class="token-name">--radius-full</div>
+        <div class="token-value">9999px</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: COMPONENTS -->
+<div class="page">
+  <h1 class="page-title">Components</h1>
+  
+  <div class="section">
+    <h2 class="section-title">AchievementCard (variants: default, completed, locked)</h2>
+    <div style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+      <div class="achievement-card completed">
+        <div class="card-badge badge-success">✓</div>
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-title">Сезонный охотник</div>
+        <div class="achievement-game">Яндекс Игры</div>
+      </div>
+      <div class="achievement-card locked">
+        <div class="achievement-icon">🏆</div>
+        <div class="achievement-title">Новичок</div>
+        <div class="achievement-game">Шахматы</div>
+      </div>
+      <div class="achievement-card" style="position: relative;">
+        <div class="card-badge badge-rare">★</div>
+        <div class="achievement-icon" style="background: #FFD400;">⭐</div>
+        <div class="achievement-title">Мастер</div>
+        <div class="achievement-game">Лучник</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">GameTab (variants: active, inactive)</h2>
+    <div class="game-tabs">
+      <button class="game-tab active">Все игры</button>
+      <button class="game-tab inactive">Лучник</button>
+      <button class="game-tab inactive">Находкин</button>
+      <button class="game-tab inactive">Шахматы</button>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">ProgressRing</h2>
+    <div class="progress-ring-wrapper">
+      <div class="progress-ring">
+        <svg width="160" height="160">
+          <circle class="track" cx="80" cy="80" r="70"></circle>
+          <circle class="progress" cx="80" cy="80" r="70" stroke-dasharray="439.8" stroke-dashoffset="251.8"></circle>
+        </svg>
+        <div class="label">43%</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">LeaderboardRow</h2>
+    <div class="leaderboard">
+      <div class="leaderboard-row">
+        <div class="rank">1</div>
+        <div class="avatar"></div>
+        <div class="name">Александр</div>
+        <div class="score">100%</div>
+      </div>
+      <div class="leaderboard-row">
+        <div class="rank">2</div>
+        <div class="avatar"></div>
+        <div class="name">Ирина</div>
+        <div class="score">87%</div>
+      </div>
+      <div class="leaderboard-row highlight">
+        <div class="rank">4</div>
+        <div class="avatar"></div>
+        <div class="name">Настя</div>
+        <div class="score">65%</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Header</h2>
+    <div class="header">
+      <div class="header-back">←</div>
+      <div class="header-title">Достижения</div>
+      <div class="header-back">⋮</div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Tab Switcher</h2>
+    <div class="tab-switcher">
+      <button class="active">Друзья</button>
+      <button>Все игроки</button>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">StatsCard</h2>
+    <div class="stats-row">
+      <div class="stats-card">
+        <div class="stats-value">24/56</div>
+        <div class="stats-label">Получено</div>
+      </div>
+      <div class="stats-card">
+        <div class="stats-value">43%</div>
+        <div class="stats-label">Выполнено</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: SCREENS -->
+<div class="page">
+  <h1 class="page-title">Screens</h1>
+  
+  <div class="screen-list">
+    <!-- Screen 1: Achievements List -->
+    <div class="screen-wrapper">
+      <div class="screen-label">1. Список достижений</div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="header">
+          <div class="header-back">←</div>
+          <div class="header-title">Достижения</div>
+          <div class="header-back">🔍</div>
+        </div>
+        <div class="game-tabs">
+          <button class="game-tab active">Все</button>
+          <button class="game-tab inactive">Лучник</button>
+          <button class="game-tab inactive">Находкин</button>
+        </div>
+        <div class="stats-row">
+          <div class="stats-card">
+            <div class="stats-value">24/56</div>
+            <div class="stats-label">Получено</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-value">43%</div>
+            <div class="stats-label">Выполнено</div>
+          </div>
+        </div>
+        <div class="achievements-grid">
+          <div class="achievement-card completed">
+            <div class="card-badge badge-success">✓</div>
+            <div class="achievement-icon">🏆</div>
+            <div class="achievement-title">Сезонный охотник</div>
+            <div class="achievement-game">Яндекс Игры</div>
+          </div>
+          <div class="achievement-card completed">
+            <div class="card-badge badge-success">✓</div>
+            <div class="achievement-icon">🎮</div>
+            <div class="achievement-title">Тест-плей</div>
+            <div class="achievement-game">Яндекс Игры</div>
+          </div>
+          <div class="achievement-card completed">
+            <div class="card-badge badge-success">✓</div>
+            <div class="achievement-icon">🎯</div>
+            <div class="achievement-title">Мастер стрельбы</div>
+            <div class="achievement-game">Лучник</div>
+          </div>
+          <div class="achievement-card locked">
+            <div class="achievement-icon">?</div>
+            <div class="achievement-title">Новичок</div>
+            <div class="achievement-game">Шахматы</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Screen 2: Achievement Detail -->
+    <div class="screen-wrapper">
+      <div class="screen-label">2. Детали достижения</div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="header">
+          <div class="header-back">←</div>
+          <div class="header-title">Достижение</div>
+          <div class="header-back"></div>
+        </div>
+        <div class="detail-content">
+          <div class="detail-icon">🏆</div>
+          <div class="detail-title">Сезонный охотник</div>
+          <div class="detail-game">Яндекс Игры</div>
+          <div class="detail-desc">Завершите игровой сезон, выполнив все ежедневные задания</div>
+          <div class="detail-progress">
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+          <div class="detail-date">✓ Получено 15.03.2024</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Screen 3: My Progress -->
+    <div class="screen-wrapper">
+      <div class="screen-label">3. Мой прогресс</div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="header">
+          <div class="header-back">←</div>
+          <div class="header-title">Мой прогресс</div>
+          <div class="header-back"></div>
+        </div>
+        <div class="progress-ring-wrapper">
+          <div class="progress-ring" style="width: 140px; height: 140px;">
+            <svg width="140" height="140">
+              <circle class="track" cx="70" cy="70" r="60" style="stroke: #E3E3E3;"></circle>
+              <circle cx="70" cy="70" r="60" fill="none" stroke="#1A88FF" stroke-width="10" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="215.5"></circle>
+            </svg>
+            <div class="label" style="font-size: 28px;">43%</div>
+          </div>
+        </div>
+        <div style="text-align: center; padding: 0 var(--space-lg) var(--space-md);">
+          <div style="font-size: 20px; font-weight: 600;">Общий прогресс</div>
+          <div style="font-size: 12px; color: #6E6E6E;">24 из 56 достижений</div>
+        </div>
+        <div class="game-progress-list">
+          <div class="game-progress-item">
+            <div class="game-progress-info">
+              <div class="game-progress-name">Яндекс Игры</div>
+              <div class="game-progress-stats">2/3 • 67%</div>
+            </div>
+            <div class="game-progress-bar">
+              <div class="progress-bar" style="height: 6px;">
+                <div class="progress-bar-fill" style="width: 67%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="game-progress-item">
+            <div class="game-progress-info">
+              <div class="game-progress-name">Лучник</div>
+              <div class="game-progress-stats">2/5 • 40%</div>
+            </div>
+            <div class="game-progress-bar">
+              <div class="progress-bar" style="height: 6px;">
+                <div class="progress-bar-fill" style="width: 40%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="game-progress-item">
+            <div class="game-progress-info">
+              <div class="game-progress-name">Находкин</div>
+              <div class="game-progress-stats">0/4 • 0%</div>
+            </div>
+            <div class="game-progress-bar">
+              <div class="progress-bar" style="height: 6px;">
+                <div class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Screen 4: Leaderboard -->
+    <div class="screen-wrapper">
+      <div class="screen-label">4. Рейтинг</div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="header">
+          <div class="header-back">←</div>
+          <div class="header-title">Рейтинг</div>
+          <div class="header-back"></div>
+        </div>
+        <div class="tab-switcher">
+          <button class="active">Друзья</button>
+          <button>Все игроки</button>
+        </div>
+        <input class="search-input" placeholder="Поиск по нику" style="margin: 0 var(--space-md); width: calc(100% - var(--space-xl));">
+        <div class="leaderboard">
+          <div class="leaderboard-row">
+            <div class="rank">1</div>
+            <div class="avatar" style="background: #E3F2FD;"></div>
+            <div class="name">Александр</div>
+            <div class="score">100%</div>
+          </div>
+          <div class="leaderboard-row">
+            <div class="rank">2</div>
+            <div class="avatar" style="background: #E3F2FD;"></div>
+            <div class="name">Ирина</div>
+            <div class="score">87%</div>
+          </div>
+          <div class="leaderboard-row">
+            <div class="rank">3</div>
+            <div class="avatar" style="background: #E3F2FD;"></div>
+            <div class="name">Константин</div>
+            <div class="score">76%</div>
+          </div>
+          <div class="leaderboard-row highlight">
+            <div class="rank">4</div>
+            <div class="avatar" style="background: #1A88FF;"></div>
+            <div class="name">Вы</div>
+            <div class="score">43%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: CONTENT -->
+<div class="page">
+  <h1 class="page-title">Content (Mock Data)</h1>
+  
+  <div class="section">
+    <h2 class="section-title">Игры и достижения</h2>
+    <div class="game-progress-list">
+      <div class="game-progress-item">
+        <div class="game-progress-info">
+          <div class="game-progress-name">Яндекс Игры</div>
+          <div class="game-progress-stats">3 достижения</div>
+        </div>
+      </div>
+      <div class="game-progress-item">
+        <div class="game-progress-info">
+          <div class="game-progress-name">Лучник</div>
+          <div class="game-progress-stats">5 достижений</div>
+        </div>
+      </div>
+      <div class="game-progress-item">
+        <div class="game-progress-info">
+          <div class="game-progress-name">Находкин</div>
+          <div class="game-progress-stats">4 достижения</div>
+        </div>
+      </div>
+      <div class="game-progress-item">
+        <div class="game-progress-info">
+          <div class="game-progress-name">Шахматы</div>
+          <div class="game-progress-stats">2 достижения</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Таблица достижений</h2>
+    <table style="width: 100%; border-collapse: collapse; background: var(--color-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);">
+      <thead>
+        <tr style="background: var(--color-bg);">
+          <th style="padding: var(--space-md); text-align: left; font-size: 12px; color: var(--color-text-secondary);">Название</th>
+          <th style="padding: var(--space-md); text-align: left; font-size: 12px; color: var(--color-text-secondary);">Игра</th>
+          <th style="padding: var(--space-md); text-align: left; font-size: 12px; color: var(--color-text-secondary);">Статус</th>
+          <th style="padding: var(--space-md); text-align: left; font-size: 12px; color: var(--color-text-secondary);">Дата</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top: 1px solid var(--color-border);">
+          <td style="padding: var(--space-md);">Сезонный охотник</td>
+          <td style="padding: var(--space-md);">Яндекс Игры</td>
+          <td style="padding: var(--space-md); color: var(--color-success);">✓ Получено</td>
+          <td style="padding: var(--space-md);">15.03.2024</td>
+        </tr>
+        <tr style="border-top: 1px solid var(--color-border);">
+          <td style="padding: var(--space-md);">Тест-плей</td>
+          <td style="padding: var(--space-md);">Яндекс Игры</td>
+          <td style="padding: var(--space-md); color: var(--color-success);">✓ Получено</td>
+          <td style="padding: var(--space-md);">20.02.2024</td>
+        </tr>
+        <tr style="border-top: 1px solid var(--color-border);">
+          <td style="padding: var(--space-md);">Мастер стрельбы</td>
+          <td style="padding: var(--space-md);">Лучник</td>
+          <td style="padding: var(--space-md); color: var(--color-success);">✓ Получено</td>
+          <td style="padding: var(--space-md);">10.01.2024</td>
+        </tr>
+        <tr style="border-top: 1px solid var(--color-border);">
+          <td style="padding: var(--space-md);">Первая победа</td>
+          <td style="padding: var(--space-md);">Лучник</td>
+          <td style="padding: var(--space-md); color: var(--color-success);">✓ Получено</td>
+          <td style="padding: var(--space-md);">05.01.2024</td>
+        </tr>
+        <tr style="border-top: 1px solid var(--color-border);">
+          <td style="padding: var(--space-md);">Новичок</td>
+          <td style="padding: var(--space-md);">Находкин</td>
+          <td style="padding: var(--space-md); color: var(--color-text-tertiary);">🔒 Заблокировано</td>
+          <td style="padding: var(--space-md);">—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="section">
+    <h2 class="section-title">Пользователи рейтинга</h2>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md);">
+      <div style="background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); text-align: center; box-shadow: var(--shadow-sm);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-border); margin: 0 auto var(--space-sm);"></div>
+        <div style="font-weight: 600; font-size: 14px;">Александр</div>
+        <div style="font-size: 12px; color: var(--color-primary);">100%</div>
+        <div style="font-size: 11px; color: var(--color-text-tertiary);">#1</div>
+      </div>
+      <div style="background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); text-align: center; box-shadow: var(--shadow-sm);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-border); margin: 0 auto var(--space-sm);"></div>
+        <div style="font-weight: 600; font-size: 14px;">Ирина</div>
+        <div style="font-size: 12px; color: var(--color-primary);">87%</div>
+        <div style="font-size: 11px; color: var(--color-text-tertiary);">#2</div>
+      </div>
+      <div style="background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); text-align: center; box-shadow: var(--shadow-sm);">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--color-border); margin: 0 auto var(--space-sm);"></div>
+        <div style="font-weight: 600; font-size: 14px;">Константин</div>
+        <div style="font-size: 12px; color: var(--color-primary);">76%</div>
+        <div style="font-size: 11px; color: var(--color-text-tertiary);">#3</div>
+      </div>
+      <div style="background: var(--color-surface); border-radius: var(--radius-md); padding: var(--space-md); text-align: center; box-shadow: var(--shadow-sm); border: 2px solid #1A88FF;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: #1A88FF; margin: 0 auto var(--space-sm);"></div>
+        <div style="font-weight: 600; font-size: 14px;">Вы</div>
+        <div style="font-size: 12px; color: var(--color-primary);">43%</div>
+        <div style="font-size: 11px; color: var(--color-text-tertiary);">#4</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" style="background: var(--color-text-primary); color: white;">
+  <h1 class="page-title" style="color: white;">Техническая спецификация</h1>
+  <div class="section">
+    <h2 style="font-size: 18px; margin-bottom: var(--space-md);">Для разработчиков</h2>
+    <p style="color: #A6A6A6; margin-bottom: var(--space-md);">Файл: design-system.json (JSON)</p>
+    <pre style="background: #333; padding: var(--space-md); border-radius: var(--radius-md); overflow-x: auto; font-size: 12px; color: #A6A6A6;">// Использование в коде
+const tokens = {
+  colors: {
+    primary: '#1A88FF',
+    success: '#28A745'
+  },
+  spacing: {
+    xs: 4,
+    sm: 8,
+    md: 16
+  }
+};
+
+// CSS Variables
+:root {
+  --color-primary: #1A88FF;
+  --color-success: #28A745;
+  --space-md: 16px;
+  --radius-md: 12px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.08);
+}</pre>
+  </div>
+  <div class="section">
+    <h2 style="font-size: 18px; margin-bottom: var(--space-md);">Screen Frames</h2>
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Viewport</td>
+        <td style="padding: var(--space-sm);">375 × 812 px</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Safe Area Top</td>
+        <td style="padding: var(--space-sm);">44 px</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Safe Area Bottom</td>
+        <td style="padding: var(--space-sm);">34 px</td>
+      </tr>
+    </table>
+  </div>
+  <div class="section">
+    <h2 style="font-size: 18px; margin-bottom: var(--space-md);">Interactions</h2>
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Tap Achievement</td>
+        <td style="padding: var(--space-sm);">navigate_to → achievement_detail</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Tap Game Tab</td>
+        <td style="padding: var(--space-sm);">filter → achievements_list</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Swipe Card</td>
+        <td style="padding: var(--space-sm);">open → card_preview</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #333;">
+        <td style="padding: var(--space-sm); color: #A6A6A6;">Tap Leaderboard Row</td>
+        <td style="padding: var(--space-sm);">navigate_to → user_profile</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+</body>
+</html>

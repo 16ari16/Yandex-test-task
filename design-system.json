@@ -1,0 +1,658 @@
+{
+  "designSystem": {
+    "name": "Yandex Games - Achievements",
+    "version": "1.0",
+    "description": "Дизайн-система для списка достижений в личном кабинете",
+    "platform": "mobile",
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "safeArea": {
+        "top": 44,
+        "bottom": 34
+      }
+    }
+  },
+
+  "tokens": {
+    "colors": {
+      "--color-primary": {
+        "value": "#1A88FF",
+        "description": "Основной синий (Яндекс)"
+      },
+      "--color-primary-pressed": {
+        "value": "#1570DE",
+        "description": "Основной - при нажатии"
+      },
+      "--color-success": {
+        "value": "#28A745",
+        "description": "Выполнено/получено"
+      },
+      "--color-warning": {
+        "value": "#FFD400",
+        "description": "Редкое/золотое достижение"
+      },
+      "--color-error": {
+        "value": "#F44336",
+        "description": "Ошибка"
+      },
+      "--color-bg": {
+        "value": "#F5F5F5",
+        "description": "Фон страницы"
+      },
+      "--color-surface": {
+        "value": "#FFFFFF",
+        "description": "Карточки, поверхности"
+      },
+      "--color-text-primary": {
+        "value": "#212121",
+        "description": "Основной текст"
+      },
+      "--color-text-secondary": {
+        "value": "#6E6E6E",
+        "description": "Вторичный текст"
+      },
+      "--color-text-tertiary": {
+        "value": "#A6A6A6",
+        "description": "Подсказки, плейсхолдеры"
+      },
+      "--color-border": {
+        "value": "#E3E3E3",
+        "description": "Границы, разделители"
+      },
+      "--color-icon": {
+        "value": "#5F5F5F",
+        "description": "Иконки"
+      }
+    },
+
+    "spacing": {
+      "--space-xs": { "value": 4 },
+      "--space-sm": { "value": 8 },
+      "--space-md": { "value": 16 },
+      "--space-lg": { "value": 24 },
+      "--space-xl": { "value": 32 },
+      "--space-2xl": { "value": 48 }
+    },
+
+    "typography": {
+      "--text-h1": {
+        "value": { "size": 24, "weight": 700, "lineHeight": 28 },
+        "description": "Заголовок экрана"
+      },
+      "--text-h2": {
+        "value": { "size": 20, "weight": 600, "lineHeight": 24 },
+        "description": "Подзаголовок"
+      },
+      "--text-body": {
+        "value": { "size": 16, "weight": 400, "lineHeight": 20 },
+        "description": "Основной текст"
+      },
+      "--text-body-semibold": {
+        "value": { "size": 16, "weight": 600, "lineHeight": 20 },
+        "description": "Основной текст (жирный)"
+      },
+      "--text-caption": {
+        "value": { "size": 12, "weight": 400, "lineHeight": 16 },
+        "description": "Подписи"
+      },
+      "--text-label": {
+        "value": { "size": 14, "weight": 500, "lineHeight": 18 },
+        "description": "Лейблы кнопок"
+      }
+    },
+
+    "borderRadius": {
+      "--radius-sm": { "value": 8 },
+      "--radius-md": { "value": 12 },
+      "--radius-lg": { "value": 16 },
+      "--radius-full": { "value": 9999 }
+    },
+
+    "shadow": {
+      "--shadow-sm": {
+        "value": "0 1px 2px rgba(0,0,0,0.08)",
+        "description": "Маленькая тень"
+      },
+      "--shadow-md": {
+        "value": "0 4px 12px rgba(0,0,0,0.1)",
+        "description": "Средняя тень"
+      },
+      "--shadow-glow": {
+        "value": "0 0 24px rgba(255,212,0,0.4)",
+        "description": "Свечение для редких достижений"
+      }
+    }
+  },
+
+  "components": {
+    "AchievementCard": {
+      "frames": {
+        "default": {
+          "width": 170,
+          "height": 160,
+          "layout": "vertical",
+          "gap": 8,
+          "padding": 12,
+          "background": "--color-surface",
+          "borderRadius": "--radius-md",
+          "shadow": "--shadow-sm"
+        },
+        "locked": {
+          "opacity": 0.5
+        },
+        "completed": {
+          "border": "2px solid --color-success"
+        }
+      },
+      "elements": {
+        "icon": {
+          "type": "icon",
+          "size": 48,
+          "align": "center"
+        },
+        "title": {
+          "type": "text",
+          "style": "--text-body-semibold",
+          "color": "--color-text-primary",
+          "maxLines": 2
+        },
+        "game": {
+          "type": "text",
+          "style": "--text-caption",
+          "color": "--color-text-secondary"
+        },
+        "status": {
+          "type": "badge",
+          "position": "top-right"
+        },
+        "date": {
+          "type": "text",
+          "style": "--text-caption",
+          "color": "--color-text-tertiary",
+          "format": "DD.MM.YYYY"
+        }
+      }
+    },
+
+    "GameTab": {
+      "frames": {
+        "active": {
+          "background": "--color-primary",
+          "borderRadius": "--radius-full",
+          "height": 36,
+          "paddingH": 16
+        },
+        "inactive": {
+          "background": "transparent",
+          "border": "1px solid --color-border",
+          "borderRadius": "--radius-full",
+          "height": 36,
+          "paddingH": 16
+        }
+      },
+      "elements": {
+        "label": {
+          "type": "text",
+          "style": "--text-label",
+          "activeColor": "#FFFFFF",
+          "inactiveColor": "--color-text-secondary"
+        },
+        "count": {
+          "type": "badge",
+          "position": "inline"
+        }
+      }
+    },
+
+    "ProgressRing": {
+      "variants": {
+        "small": { "size": 40, "stroke": 4 },
+        "medium": { "size": 80, "stroke": 6 },
+        "large": { "size": 160, "stroke": 10 }
+      },
+      "elements": {
+        "track": {
+          "stroke": "--color-border",
+          "fill": "none"
+        },
+        "progress": {
+          "stroke": "--color-primary",
+          "fill": "none"
+        },
+        "label": {
+          "type": "text",
+          "style": "--text-h2",
+          "color": "--color-text-primary",
+          "align": "center"
+        }
+      }
+    },
+
+    "AchievementBadge": {
+      "variants": {
+        "common": {
+          "background": "--color-border",
+          "icon": "star-outline"
+        },
+        "rare": {
+          "background": "--color-warning",
+          "icon": "star"
+        },
+        "epic": {
+          "background": "--color-primary",
+          "icon": "trophy"
+        },
+        "completed": {
+          "background": "--color-success",
+          "icon": "check"
+        }
+      },
+      "sizes": {
+        "small": { "size": 20 },
+        "medium": { "size": 28 }
+      }
+    },
+
+    "LeaderboardRow": {
+      "frames": {
+        "default": {
+          "height": 56,
+          "layout": "horizontal",
+          "gap": 12,
+          "paddingH": 16,
+          "background": "--color-surface"
+        },
+        "highlight": {
+          "background": "#E3F2FD"
+        }
+      },
+      "elements": {
+        "rank": {
+          "type": "text",
+          "style": "--text-body-semibold",
+          "width": 24,
+          "align": "center"
+        },
+        "avatar": {
+          "type": "image",
+          "size": 40,
+          "borderRadius": "--radius-full"
+        },
+        "name": {
+          "type": "text",
+          "style": "--text-body-semibold",
+          "flex": 1
+        },
+        "score": {
+          "type": "text",
+          "style": "--text-body",
+          "color": "--color-primary",
+          "align": "right"
+        }
+      }
+    },
+
+    "Header": {
+      "frames": {
+        "standard": {
+          "height": 56,
+          "paddingH": 16,
+          "background": "--color-surface"
+        }
+      },
+      "elements": {
+        "backButton": {
+          "type": "icon-button",
+          "icon": "chevron-left",
+          "size": 24
+        },
+        "title": {
+          "type": "text",
+          "style": "--text-h2",
+          "align": "center"
+        },
+        "action": {
+          "type": "icon-button",
+          "position": "right"
+        }
+      }
+    },
+
+    "StatsCard": {
+      "frames": {
+        "default": {
+          "background": "--color-surface",
+          "borderRadius": "--radius-md",
+          "padding": 16,
+          "shadow": "--shadow-sm"
+        }
+      },
+      "elements": {
+        "label": {
+          "type": "text",
+          "style": "--text-caption",
+          "color": "--color-text-secondary"
+        },
+        "value": {
+          "type": "text",
+          "style": "--text-h1",
+          "color": "--color-primary"
+        },
+        "subtitle": {
+          "type": "text",
+          "style": "--text-caption",
+          "color": "--color-text-tertiary"
+        }
+      }
+    },
+
+    "ProgressBar": {
+      "frames": {
+        "default": {
+          "height": 8,
+          "borderRadius": "--radius-full",
+          "background": "--color-border"
+        },
+        "filled": {
+          "background": "--color-primary",
+          "borderRadius": "--radius-full"
+        }
+      },
+      "elements": {
+        "track": { "type": "rect" },
+        "progress": { "type": "rect" },
+        "label": {
+          "type": "text",
+          "style": "--text-caption",
+          "position": "above"
+        }
+      }
+    }
+  },
+
+  "screens": {
+    "achievements_list": {
+      "frame": { "width": 375, "height": 812 },
+      "layout": "vertical",
+      "background": "--color-bg",
+      "sections": [
+        {
+          "id": "header",
+          "component": "Header",
+          "title": "Достижения"
+        },
+        {
+          "id": "tabs",
+          "layout": "horizontal",
+          "scroll": true,
+          "gap": 8,
+          "padding": "0 16",
+          "items": ["Все игры", "Лучник", "Находкин", "Яндекс Игры", "Шахматы"]
+        },
+        {
+          "id": "stats",
+          "layout": "horizontal",
+          "gap": 12,
+          "padding": 16,
+          "items": [
+            { "component": "StatsCard", "label": "Получено", "value": "24/56", "subtitle": "из 56" },
+            { "component": "StatsCard", "label": "Процент", "value": "43%", "subtitle": "выполнено" }
+          ]
+        },
+        {
+          "id": "achievements",
+          "layout": "grid",
+          "columns": 2,
+          "gap": 12,
+          "padding": "0 16 16",
+          "items": [
+            { "component": "AchievementCard", "title": "Сезонный охотник", "game": "Яндекс Игры", "status": "completed", "date": "15.03.2024" },
+            { "component": "AchievementCard", "title": "Тест-плей", "game": "Яндекс Игры", "status": "completed", "date": "20.02.2024" },
+            { "component": "AchievementCard", "title": "Мастер стрельбы", "game": "Лучник", "status": "completed", "date": "10.01.2024" },
+            { "component": "AchievementCard", "title": "Первая победа", "game": "Лучник", "status": "completed", "date": "05.01.2024" },
+            { "component": "AchievementCard", "title": "Новичок", "game": "Находкин", "status": "locked" },
+            { "component": "AchievementCard", "title": "Сокровища", "game": "Находкин", "status": "locked" },
+            { "component": "AchievementCard", "title": "Легенда", "game": "Шахматы", "status": "locked" },
+            { "component": "AchievementCard", "title": "Гроссмейстер", "game": "Шахматы", "status": "locked" }
+          ]
+        }
+      ]
+    },
+
+    "achievement_detail": {
+      "frame": { "width": 375, "height": 812 },
+      "layout": "vertical",
+      "sections": [
+        {
+          "id": "header",
+          "component": "Header",
+          "title": "Достижение",
+          "backButton": true
+        },
+        {
+          "id": "content",
+          "layout": "vertical",
+          "align": "center",
+          "gap": 16,
+          "padding": 24,
+          "items": [
+            {
+              "id": "icon",
+              "size": 120,
+              "type": "icon",
+              "glow": true
+            },
+            {
+              "id": "title",
+              "text": "Сезонный охотник",
+              "style": "--text-h1",
+              "align": "center"
+            },
+            {
+              "id": "game",
+              "text": "Яндекс Игры",
+              "badge": true
+            },
+            {
+              "id": "description",
+              "text": "Завершите игровой сезон, выполнив все задания",
+              "style": "--text-body",
+              "color": "--color-text-secondary",
+              "align": "center"
+            },
+            {
+              "id": "progress",
+              "component": "ProgressBar",
+              "current": 100,
+              "max": 100
+            },
+            {
+              "id": "date",
+              "text": "Получено 15.03.2024",
+              "style": "--text-caption",
+              "color": "--color-success"
+            }
+          ]
+        }
+      ]
+    },
+
+    "my_progress": {
+      "frame": { "width": 375, "height": 812 },
+      "layout": "vertical",
+      "sections": [
+        {
+          "id": "header",
+          "component": "Header",
+          "title": "Мой прогресс"
+        },
+        {
+          "id": "ring",
+          "layout": "vertical",
+          "align": "center",
+          "gap": 16,
+          "padding": 32,
+          "items": [
+            {
+              "component": "ProgressRing",
+              "variant": "large",
+              "progress": 43,
+              "label": "43%"
+            },
+            {
+              "id": "title",
+              "text": "Общий прогресс",
+              "style": "--text-h2"
+            },
+            {
+              "id": "subtitle",
+              "text": "24 из 56 достижений",
+              "style": "--text-caption",
+              "color": "--color-text-secondary"
+            }
+          ]
+        },
+        {
+          "id": "by_game",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 16,
+          "items": [
+            {
+              "id": "section_title",
+              "text": "По играм",
+              "style": "--text-h2"
+            },
+            { "game": "Яндекс Игры", "progress": "2/3", "percent": 67 },
+            { "game": "Лучник", "progress": "2/5", "percent": 40 },
+            { "game": "Находкин", "progress": "0/4", "percent": 0 },
+            { "game": "Шахматы", "progress": "0/2", "percent": 0 }
+          ]
+        }
+      ]
+    },
+
+    "leaderboard": {
+      "frame": { "width": 375, "height": 812 },
+      "layout": "vertical",
+      "sections": [
+        {
+          "id": "header",
+          "component": "Header",
+          "title": "Рейтинг"
+        },
+        {
+          "id": "tabs",
+          "layout": "horizontal",
+          "centered": true,
+          "items": [
+            { "label": "Друзья", "active": true },
+            { "label": "Все игроки", "active": false }
+          ]
+        },
+        {
+          "id": "search",
+          "layout": "horizontal",
+          "padding": 16,
+          "placeholder": "Поиск по нику"
+        },
+        {
+          "id": "list",
+          "layout": "vertical",
+          "gap": 0,
+          "items": [
+            { "rank": 1, "name": "Александр", "score": "100%", "avatar": "avatar_1" },
+            { "rank": 2, "name": "Ирина", "score": "87%", "avatar": "avatar_2" },
+            { "rank": 3, "name": "Константин", "score": "76%", "avatar": "avatar_3" },
+            { "rank": 4, "name": "Настя", "score": "65%", "avatar": "avatar_4", "highlight": true },
+            { "rank": 5, "name": "Дмитрий", "score": "54%", "avatar": "avatar_5" },
+            { "rank": 6, "name": "Елена", "score": "43%", "avatar": "avatar_6" },
+            { "rank": 7, "name": "Сергей", "score": "32%", "avatar": "avatar_7" },
+            { "rank": 8, "name": "Анна", "score": "21%", "avatar": "avatar_8" }
+          ]
+        },
+        {
+          "id": "your_position",
+          "component": "LeaderboardRow",
+          "highlight": true,
+          "position": "sticky-bottom"
+        }
+      ]
+    }
+  },
+
+  "content": {
+    "games": [
+      {
+        "id": "ya_games",
+        "name": "Яндекс Игры",
+        "achievements": [
+          { "id": "season_hunter", "title": "Сезонный охотник", "status": "completed", "date": "2024-03-15" },
+          { "id": "test_play", "title": "Тест-плей", "status": "completed", "date": "2024-02-20" },
+          { "id": "winner", "title": "Победитель", "status": "locked" }
+        ]
+      },
+      {
+        "id": "archer",
+        "name": "Лучник",
+        "achievements": [
+          { "id": "master_archer", "title": "Мастер стрельбы", "status": "completed", "date": "2024-01-10" },
+          { "id": "first_win", "title": "Первая победа", "status": "completed", "date": "2024-01-05" },
+          { "id": "expert", "title": "Эксперт", "status": "locked" },
+          { "id": "legend", "title": "Легенда", "status": "locked" },
+          { "id": "champion", "title": "Чемпион", "status": "locked" }
+        ]
+      },
+      {
+        "id": "nakhodkin",
+        "name": "Находкин",
+        "achievements": [
+          { "id": "rookie", "title": "Новичок", "status": "locked" },
+          { "id": "treasures", "title": "Сокровища", "status": "locked" },
+          { "id": "adventurer", "title": "Исследователь", "status": "locked" },
+          { "id": "legendary", "title": "Легенда", "status": "locked" }
+        ]
+      },
+      {
+        "id": "chess",
+        "name": "Шахматы",
+        "achievements": [
+          { "id": "novice_chess", "title": "Новичок", "status": "locked" },
+          { "id": "grandmaster", "title": "Гроссмейстер", "status": "locked" }
+        ]
+      }
+    ],
+
+    "users": [
+      { "id": 1, "name": "Александр", "score": 100, "avatar": "user_1" },
+      { "id": 2, "name": "Ирина", "score": 87, "avatar": "user_2" },
+      { "id": 3, "name": "Константин", "score": 76, "avatar": "user_3" },
+      { "id": 4, "name": "Настя", "score": 65, "avatar": "user_4" },
+      { "id": 5, "name": "Дмитрий", "score": 54, "avatar": "user_5" },
+      { "id": 6, "name": "Елена", "score": 43, "avatar": "user_6" },
+      { "id": 7, "name": "Сергей", "score": 32, "avatar": "user_7" },
+      { "id": 8, "name": "Анна", "score": 21, "avatar": "user_8" }
+    ]
+  },
+
+  "interactions": {
+    "tap_achievement": {
+      "action": "navigate_to",
+      "target": "achievement_detail"
+    },
+    "tap_game_tab": {
+      "action": "filter",
+      "target": "achievements_list",
+      "filter_by": "game"
+    },
+    "swipe_achievement": {
+      "action": "expand",
+      "target": "card_preview"
+    },
+    "tap_leaderboard_row": {
+      "action": "navigate_to",
+      "target": "user_profile"
+    }
+  }
+}
